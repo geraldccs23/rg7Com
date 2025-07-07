@@ -5,8 +5,8 @@ import {
   CommissionCEVFilters,
   CommissionVWFilters,
   CommissionVendedorFilters,
-  GerenteGeneralTab,
 } from "../types/commissions";
+import { GerenteGeneralTab } from "./commissions/GerenteGeneralTab"; // ✅ esta es la correcta
 import { CEVCommissionsTab } from "./commissions/CEVCommissionsTab";
 import { VendedorCommissionsTab } from "./commissions/VendedorCommissionsTab";
 import { VWCommissionsTab } from "./commissions/VWCommissionsTab";

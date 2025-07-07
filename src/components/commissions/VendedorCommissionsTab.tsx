@@ -1,28 +1,36 @@
-import React, { useState, useMemo } from 'react';
-import { Users, Filter, Download, Calendar } from 'lucide-react';
-import { SalesRecord } from '../../types/sales';
-import { CommissionVendedorFilters } from '../../types/commissions';
-import { calculateVendedorCommissions, getAvailableWeeks } from '../../utils/commissionCalculator';
-import { calculateWeeklyBonuses } from '../../utils/commissionCalculator';
-import { CommissionResults } from './CommissionResults';
-import { WeeklyCommissionResults } from './WeeklyCommissionResults';
-
+import React, { useState, useMemo } from "react";
+import { Users, Filter, Download, Calendar } from "lucide-react";
+import { SalesRecord } from "../../types/sales";
+import { CommissionVendedorFilters } from "../../types/commissions";
+import {
+  calculateVendedorCommissions,
+  getAvailableWeeks,
+} from "../../utils/commissionCalculator";
+import { calculateWeeklyBonuses } from "../../utils/commissionCalculator";
+import { CommissionResults } from "./CommissionResults";
+import { WeeklyCommissionResults } from "./WeeklyCommissionResults";
 
 interface VendedorCommissionsTabProps {
   salesData: SalesRecord[];
   vendedores: string[];
 }
 
-export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommissionsTabProps) {
+export function VendedorCommissionsTab({
+  salesData,
+  vendedores,
+}: VendedorCommissionsTabProps) {
   const [filters, setFilters] = useState<CommissionVendedorFilters>({
     porcentaje: 3,
-    semanas: []
+    semanas: [],
   });
 
   const [showResults, setShowResults] = useState(false);
-  const [viewMode, setViewMode] = useState<'summary' | 'weekly'>('summary');
+  const [viewMode, setViewMode] = useState<"summary" | "weekly">("summary");
 
-  const availableWeeks = useMemo(() => getAvailableWeeks(salesData), [salesData]);
+  const availableWeeks = useMemo(
+    () => getAvailableWeeks(salesData),
+    [salesData]
+  );
 
   const commissionData = useMemo(() => {
     if (!showResults) return null;
@@ -41,9 +49,9 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
   const handleWeekToggle = (week: number) => {
     const currentWeeks = filters.semanas || [];
     const newWeeks = currentWeeks.includes(week)
-      ? currentWeeks.filter(w => w !== week)
+      ? currentWeeks.filter((w) => w !== week)
       : [...currentWeeks, week];
-    
+
     setFilters({ ...filters, semanas: newWeeks });
   };
 
@@ -57,44 +65,52 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
 
   const handleExport = () => {
     if (!commissionData) return;
-    
-    const csvContent = viewMode === 'summary' 
-      ? [
-          ['Vendedor', 'Total Ventas', 'Comisión', 'Período'].join(','),
-          ...commissionData.summary.resultados.map(result => [
-            result.vendedor,
-            result.totalVentas.toFixed(2),
-            result.comision.toFixed(2),
-            result.periodo
-          ].join(','))
-        ].join('\n')
-      : [
-          ['Vendedor', 'Semana', 'Total Ventas', 'Comisión'].join(','),
-          ...commissionData.weeklyResults.map(result => [
-            result.vendedor,
-            result.semana,
-            result.totalVentas.toFixed(2),
-            result.comision.toFixed(2)
-          ].join(','))
-        ].join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+
+    const csvContent =
+      viewMode === "summary"
+        ? [
+            ["Vendedor", "Total Ventas", "Comisión", "Período"].join(","),
+            ...commissionData.summary.resultados.map((result) =>
+              [
+                result.vendedor,
+                result.totalVentas.toFixed(2),
+                result.comision.toFixed(2),
+                result.periodo,
+              ].join(",")
+            ),
+          ].join("\n")
+        : [
+            ["Vendedor", "Semana", "Total Ventas", "Comisión"].join(","),
+            ...commissionData.weeklyResults.map((result) =>
+              [
+                result.vendedor,
+                result.semana,
+                result.totalVentas.toFixed(2),
+                result.comision.toFixed(2),
+              ].join(",")
+            ),
+          ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `comisiones_vendedores_${viewMode}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `comisiones_vendedores_${viewMode}_${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   };
-
-
 
   return (
     <div className="space-y-6">
       {/* Description */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-green-900 mb-2">Comisiones por Vendedor</h3>
+        <h3 className="text-lg font-semibold text-green-900 mb-2">
+          Comisiones por Vendedor
+        </h3>
         <p className="text-green-700">
-          Calcula comisiones individuales por vendedor con análisis semanal. Ideal para combinar semanas cortas.
+          Calcula comisiones individuales por vendedor con análisis semanal.
+          Ideal para combinar semanas cortas.
         </p>
       </div>
 
@@ -112,8 +128,10 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
             </label>
             <input
               type="date"
-              value={filters.fechaInicio || ''}
-              onChange={(e) => setFilters({ ...filters, fechaInicio: e.target.value })}
+              value={filters.fechaInicio || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, fechaInicio: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -124,8 +142,10 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
             </label>
             <input
               type="date"
-              value={filters.fechaFin || ''}
-              onChange={(e) => setFilters({ ...filters, fechaFin: e.target.value })}
+              value={filters.fechaFin || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, fechaFin: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -135,30 +155,34 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
               Vendedor (Opcional)
             </label>
             <div className="h-48 overflow-y-auto border border-gray-300 rounded-md p-2 bg-white">
-            {vendedores.map(vendedor => (
-              <label key={vendedor} className="flex items-center space-x-2 text-sm text-gray-800 mb-1">
-                <input
-                  type="checkbox"
-                  value={vendedor}
-                  checked={filters.vendedores?.includes(vendedor) || false}
-                  onChange={(e) => {
-                    const selected = new Set(filters.vendedores || []);
-                    if (e.target.checked) {
-                      selected.add(vendedor);
-                    } else {
-                      selected.delete(vendedor);
-                    }
-                    setFilters({ ...filters, vendedores: Array.from(selected) });
-                  }}
-                  className="accent-purple-600"
-                />
-                <span>{vendedor}</span>
-              </label>
-            ))}
+              {vendedores.map((vendedor) => (
+                <label
+                  key={vendedor}
+                  className="flex items-center space-x-2 text-sm text-gray-800 mb-1"
+                >
+                  <input
+                    type="checkbox"
+                    value={vendedor}
+                    checked={filters.vendedores?.includes(vendedor) || false}
+                    onChange={(e) => {
+                      const selected = new Set(filters.vendedores || []);
+                      if (e.target.checked) {
+                        selected.add(vendedor);
+                      } else {
+                        selected.delete(vendedor);
+                      }
+                      setFilters({
+                        ...filters,
+                        vendedores: Array.from(selected),
+                      });
+                    }}
+                    className="accent-purple-600"
+                  />
+                  <span>{vendedor}</span>
+                </label>
+              ))}
+            </div>
           </div>
-          </div>
-
-          
         </div>
 
         {/* Week Selection */}
@@ -182,26 +206,27 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
               </button>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-6 md:grid-cols-10 lg:grid-cols-15 gap-2 max-h-32 overflow-y-auto">
-            {availableWeeks.map(week => (
+            {availableWeeks.map((week) => (
               <button
                 key={week}
                 onClick={() => handleWeekToggle(week)}
                 className={`px-3 py-2 text-sm rounded-md border transition-colors duration-200 ${
                   (filters.semanas || []).includes(week)
-                    ? 'bg-blue-500 text-white border-blue-500'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 {week}
               </button>
             ))}
           </div>
-          
+
           {(filters.semanas || []).length > 0 && (
             <p className="text-sm text-gray-600 mt-2">
-              Semanas seleccionadas: {(filters.semanas || []).sort((a, b) => a - b).join(', ')}
+              Semanas seleccionadas:{" "}
+              {(filters.semanas || []).sort((a, b) => a - b).join(", ")}
             </p>
           )}
         </div>
@@ -219,21 +244,21 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
             <div className="flex items-center space-x-4">
               <div className="flex bg-gray-200 rounded-lg p-1">
                 <button
-                  onClick={() => setViewMode('summary')}
+                  onClick={() => setViewMode("summary")}
                   className={`px-3 py-1 text-sm rounded-md transition-colors duration-200 ${
-                    viewMode === 'summary'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                    viewMode === "summary"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   Resumen
                 </button>
                 <button
-                  onClick={() => setViewMode('weekly')}
+                  onClick={() => setViewMode("weekly")}
                   className={`px-3 py-1 text-sm rounded-md transition-colors duration-200 ${
-                    viewMode === 'weekly'
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                    viewMode === "weekly"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   Por Semana
@@ -255,20 +280,18 @@ export function VendedorCommissionsTab({ salesData, vendedores }: VendedorCommis
       {/* Results */}
       {commissionData && (
         <>
-          {viewMode === 'summary' ? (
-            <CommissionResults 
-              data={commissionData.summary} 
+          {viewMode === "summary" ? (
+            <CommissionResults
+              data={commissionData.summary}
               title="Resumen Comisiones por Vendedor"
               type="vendedor"
             />
           ) : (
-            <WeeklyCommissionResults 
+            <WeeklyCommissionResults
               data={commissionData.weeklyResults}
               title="Comisiones Semanales por Vendedor"
             />
           )}
-          
-
         </>
       )}
     </div>

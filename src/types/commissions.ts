@@ -37,3 +37,15 @@ export interface CommissionSummary {
   porcentaje: number;
   resultados: CommissionResult[];
 }
+
+export interface GerenteResult {
+  fecha: string;
+  totalVentas: number;
+  comision: number;
+}
+
+export interface GerenteCommissionSummary {
+  totalVentas: number;
+  totalComisiones: number;
+  resultados: GerenteResult[];
+}
